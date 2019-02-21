@@ -23,7 +23,12 @@ function initTileLayer(L, map) {
        - Coordonnées: [57.3, -94.7];
        - Niveau de zoom: 4.
    */
-
+  map.setView([57.3, -94.7], 4);
+  L.tileLayer(
+    'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
+    maxZoom: 10,
+    minZoom: 1
+    }).addTo(map);
 }
 
 /**
@@ -36,7 +41,10 @@ function initTileLayer(L, map) {
  */
 function initSvgLayer(map) {
   // TODO: Créer l'élément SVG en vous basant sur l'exemple fourni. Assurez-vous de créer un élément "g" dans l'élément SVG.
-
+  // Add an SVG element to Leaflet’s overlay pane
+  var svg = d3.select(map.getPanes().overlayPane).append("svg"),
+  g = svg.append("g").attr("class", "leaflet-zoom-hide");
+  return svg
 }
 
 /**
@@ -58,7 +66,24 @@ function createDistricts(g, path, canada, sources, color, showPanel) {
          d'informations associé à cette circonscription doit faire son apparition (utiliser la fonction "showPanel").
          Il est à noter qu'il est possible de sélectionner uniquement une circonscription à la fois.
    */
+    var group = g.selectAll("g")
+    .data(canada.features)
+    .enter()
+    .append("g");
 
+    var canadaPath = group.append("path")
+              .attr("d",path)
+              .attr("class","canadaPath")
+        .attr("stroke-width",1)
+        .attr("stroke", "#333")
+        .style("fill-opacity", 0.8)
+        .attr("fill", d=>{
+          let curCirCon = sources.find(e =>{
+            return e.id == d.properties.NUMCF
+          })
+          return color(curCirCon.results[0].party)
+          
+        });
 }
 
 /**
@@ -74,5 +99,17 @@ function createDistricts(g, path, canada, sources, color, showPanel) {
  */
 function updateMap(svg, g, path, canada) {
   // TODO: Mettre à jour l'élément SVG, la position du groupe "g" et l'affichage des tracés en vous basant sur l'exemple fourni.
+    let bounds = path.bounds(canada);
+		var topLeft = bounds[0],
+				bottomRight = bounds[1];
+			svg.attr("width", bottomRight[0] - topLeft[0])
+				.attr("height", bottomRight[1] - topLeft[1])
+				.style("left", topLeft[0] + "px")
+				.style("top", topLeft[1] + "px");
+			g.attr("transform", "translate(" + -topLeft[0] + "," 
+                                        + -topLeft[1] + ")");
+                                        
+      var canadaPath = d3.selectAll("path.canadaPath")
+                    .attr("d",path)
 
 }
