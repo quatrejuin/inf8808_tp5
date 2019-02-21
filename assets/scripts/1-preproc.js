@@ -14,7 +14,14 @@
 function colorScale(color, parties) {
   // TODO: Préciser le domaine de l'échelle en y associant chacun des partis politique de la liste spécifiée en paramètre.
   //       De plus, préciser la gamme de couleurs en spécifiant les couleurs utilisées par chacun des partis.
-
+  let colorList = []
+  let partyList = []
+  parties.forEach(d=>{
+    partyList.push(d.name)
+    colorList.push(d.color)
+  })
+  color.domain(partyList)
+      .range(colorList)
 }
 
 /**
@@ -24,7 +31,12 @@ function colorScale(color, parties) {
  */
 function convertNumbers(data) {
   // TODO: Convertir les propriétés "id" et "votes" en type "number" pour chacun des éléments de la liste.
-
+  data.forEach(
+    d=>{
+      d.id = parseInt(d.id)
+      d.votes = parseInt(d.votes)
+    }
+  )
 }
 
 /**
@@ -57,5 +69,37 @@ function convertNumbers(data) {
 function createSources(data) {
   // TODO: Retourner l'objet ayant le format demandé. Assurez-vous de trier le tableau "results" pour chacune des entrées
   //       en ordre décroissant de votes (le candidat gagnant doit être le premier élément du tableau).
-
+  let newArray = []
+  let curCircon = ""
+  data.forEach(d=>
+    {
+      if (d.name != curCircon)
+      {
+        newArray.push({
+          id: d.id,
+          name: d.name,
+          results: [
+            {
+              candidate: d.candidate,  // Le nom du candidat
+              votes: d.votes,      // Le nombre de votes obtenus pour le candidat
+              percent: d.percent,    // Le pourcentage des votes obtenus par le candidat
+              party: d.party       // Le parti politique du candidat
+            }
+            ]
+        })
+        curCircon= d.name
+      }
+      else
+      {
+        newArray[newArray.length-1].results.unshift(
+        {
+          candidate: d.candidate,  // Le nom du candidat
+          votes: d.votes,      // Le nombre de votes obtenus pour le candidat
+          percent: d.percent,    // Le pourcentage des votes obtenus par le candidat
+          party: d.party       // Le parti politique du candidat
+        })
+      }
+      
+    })
+  return newArray
 }
