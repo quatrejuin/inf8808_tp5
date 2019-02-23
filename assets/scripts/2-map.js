@@ -83,6 +83,11 @@ function createDistricts(g, path, canada, sources, color, showPanel) {
           })
           return color(curCirCon.results[0].party)
           
+        }).on("click",function(d)
+        {
+          d3.selectAll(".canadaPath").classed("selected",false)
+          d3.select(this).classed("selected",true)
+          showPanel(d.NUMCF)
         });
 }
 
