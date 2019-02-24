@@ -108,7 +108,7 @@ function updatePanelBarChart(gBars, gAxis, districtSource, x, y, yAxis, color, p
   return y.bandwidth();
   })
   .attr("fill", function(d) {
-  return typeof(parties.find(dd=>dd.name == d.party))!=="undefined"?color(d.party):"gray"
+  return color.domain().includes(d.party)?color(d.party):"gray"
   });
 
   bars.append("text")
