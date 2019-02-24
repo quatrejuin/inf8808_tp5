@@ -79,7 +79,7 @@ function updatePanelBarChart(gBars, gAxis, districtSource, x, y, yAxis, color, p
   yAxis.tickFormat(function(d) { 
     let shortName = "Autre"
     let cur = parties.find(dd=>dd.name == d)
-    if (typeof  cur !== "undefined")
+    if (typeof(cur) !== "undefined")
     {
       shortName =  cur.abbreviation
     }
@@ -96,7 +96,6 @@ function updatePanelBarChart(gBars, gAxis, districtSource, x, y, yAxis, color, p
   .append("g")
   .classed("bar",true)
 
-  let margin = 10
   bars.append("rect")
   .attr("y", function(d) {
   return y(d.party)
@@ -109,7 +108,7 @@ function updatePanelBarChart(gBars, gAxis, districtSource, x, y, yAxis, color, p
   return y.bandwidth();
   })
   .attr("fill", function(d) {
-  return color(d.party)
+  return typeof(parties.find(dd=>dd.name == d.party))!=="undefined"?color(d.party):"gray"
   });
 
   bars.append("text")
