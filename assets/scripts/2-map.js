@@ -87,7 +87,7 @@ function createDistricts(g, path, canada, sources, color, showPanel) {
         {
           d3.selectAll(".canadaPath").classed("selected",false)
           d3.select(this).classed("selected",true)
-          showPanel(d.NUMCF)
+          showPanel(d.properties.NUMCF)
         });
 }
 

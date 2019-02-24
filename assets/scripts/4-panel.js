@@ -19,6 +19,13 @@ function updateDomains(districtSource, x, y) {
          que les partis sont triés en ordre décroissant de votes obtenus (le parti du candidat gagnant doit se retrouver
          en premier).
    */
+  let d = districtSource.results
+  x.domain([d3.min(d,dd=>dd.votes),
+    d3.max(d,dd=>dd.votes)])
+  
+  let partyList = []
+  d.forEach(vr => partyList.push(vr.party))
+  y.domain(partyList)
 
 }
 
@@ -35,7 +42,13 @@ function updatePanelInfo(panel, districtSource, formatNumber) {
        - La nom du candidat gagnant ainsi que son parti;
        - Le nombre total de votes pour tous les candidats (utilisez la fonction "formatNumber" pour formater le nombre).
    */
-
+  let d = districtSource
+  panel.select("#district-name").html(`${d.name} [${d.id}]`)
+  let winner = d.results[0]
+  panel.select("#elected-candidate").html(`${winner.candidate} (${winner.party})`)
+  let totalVotes = 0
+  totalVotes = d3.sum(d.results,dd=>dd.votes)
+  panel.select("#votes-count").html(`${formatNumber(totalVotes)} votes`)
 }
 
 /**
@@ -62,6 +75,53 @@ function updatePanelBarChart(gBars, gAxis, districtSource, x, y, yAxis, color, p
          via la liste "parties" passée en paramètre. Il est à noter que si le parti ne se trouve pas dans la liste "parties",
          vous devez indiquer "Autre" comme forme abrégée.
    */
+  gAxis.select(".y.axis").remove()
+  yAxis.tickFormat(function(d) { 
+    let shortName = "Autre"
+    let cur = parties.find(dd=>dd.name == d)
+    if (typeof  cur !== "undefined")
+    {
+      shortName =  cur.abbreviation
+    }
+    return shortName
+  })
+  gAxis.append("g")
+  .classed("y axis",true)
+  .call(yAxis)
+
+  gBars.selectAll(".bar").remove()
+  var bars = gBars.selectAll(".bar")
+  .data(districtSource.results)
+  .enter()
+  .append("g")
+  .classed("bar",true)
+
+  let margin = 10
+  bars.append("rect")
+  .attr("y", function(d) {
+  return y(d.party)
+  })
+  .attr("width", function(d) {
+    return x(d.votes)
+    }
+  )
+  .attr("height", function(d) {
+  return y.bandwidth();
+  })
+  .attr("fill", function(d) {
+  return color(d.party)
+  });
+
+  bars.append("text")
+  .attr("x", function(d) {
+    return x(d.votes) + 5
+    })
+  .attr("y", function(d) {
+    return y(d.party) + y.bandwidth()/2
+  })
+  .style("text-anchor", "start")
+  .style("alignment-baseline","middle")
+  .text(d => d.percent)
 
 }
 
@@ -72,5 +132,5 @@ function updatePanelBarChart(gBars, gAxis, districtSource, x, y, yAxis, color, p
  */
 function reset(g) {
   // TODO: Réinitialiser l'affichage de la carte en retirant la classe "selected" de tous les éléments.
-
+  g.selectAll(".selected").classed("selected",false)
 }
